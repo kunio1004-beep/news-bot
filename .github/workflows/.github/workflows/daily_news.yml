@@ -1,0 +1,29 @@
+name: Daily News Bot
+
+on:
+  schedule:
+    # 毎日 日本時間の朝7時（UTC 22:00）に実行
+    - cron: '0 22 * * *'
+  workflow_dispatch: # 手動でもボタン一つで動かせるようにする設定
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@v3
+
+      - name: Pythonをセットアップ
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: ライブラリをインストール
+        run: pip install -r requirements.txt
+
+      - name: botを実行
+        env:
+          # ここでGitHubの金庫から鍵を取り出してコードに渡す
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python main.py
